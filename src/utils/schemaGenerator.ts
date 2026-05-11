@@ -22,7 +22,7 @@ export const generateZodSchema = (schema: FormSchema) => {
         fieldValidator = z.boolean();
         if (field.required) {
           fieldValidator = z.literal(true, {
-            errorMap: () => ({ message: 'This field is required' })
+            message: 'This field is required'
           });
         }
         break;
@@ -30,7 +30,11 @@ export const generateZodSchema = (schema: FormSchema) => {
         fieldValidator = z.any();
         // custom validation logic over FileList can go here
         if (field.required) {
-          fieldValidator = fieldValidator.refine((val) => val && val.length > 0, "File is required");
+          fieldValidator = fieldValidator.refine((val: unknown) => {
+            if (val instanceof FileList) return val.length > 0;
+            if (Array.isArray(val)) return val.length > 0;
+            return Boolean(val);
+          }, "File is required");
         }
         break;
       case 'text':
