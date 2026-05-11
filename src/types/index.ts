@@ -1,4 +1,25 @@
-export type FieldType = 'text' | 'number' | 'select' | 'checkbox' | 'radio';
+export type FieldType =
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  // Personal information fields
+  | 'firstName'
+  | 'lastName'
+  | 'fullName'
+  | 'email'
+  | 'tel'
+  | 'password'
+  // Extended input fields
+  | 'textarea'
+  | 'url'
+  | 'date'
+  | 'time'
+  | 'file'
+  // Special fields
+  | 'rating'
+  | 'toggle';
 
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'email' | 'pattern';
@@ -18,6 +39,7 @@ export interface FormField {
   placeholder?: string;
   helpText?: string;
   required: boolean;
+  width?: number; // percentage 15–100, default 100 (full width)
   options?: FieldOption[]; // For select, radio, checkbox groups
   validation?: ValidationRule[];
 }

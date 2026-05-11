@@ -28,18 +28,20 @@ export const FormPreview: React.FC = () => {
   return (
     <form 
       onSubmit={handleSubmit(onSubmit)} 
-      style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '2rem' }}
+      style={{ display: 'flex', flexWrap: 'wrap', width: '100%', margin: '-0.4rem', marginTop: '2rem' }}
       aria-label={`${schema.title} Form Preview`}
     >
       {schema.fields.map(field => {
+        const displayWidth = field.width ?? 100;
         return (
-          <FormElement 
-            key={field.id}
-            field={field} 
-            value={watch(field.id)}
-            onChange={(val) => setValue(field.id, val, { shouldValidate: true })}
-            error={errors[field.id] ? (errors[field.id]?.message as string) : undefined}
-          />
+          <div key={field.id} style={{ width: `${displayWidth}%`, padding: '0.4rem', boxSizing: 'border-box' }}>
+            <FormElement 
+              field={field} 
+              value={watch(field.id)}
+              onChange={(val) => setValue(field.id, val, { shouldValidate: true })}
+              error={errors[field.id] ? (errors[field.id]?.message as string) : undefined}
+            />
+          </div>
         );
       })}
       

@@ -9,6 +9,7 @@ export const generateZodSchema = (schema: FormSchema) => {
 
     switch (field.type) {
       case 'number':
+      case 'rating':
         fieldValidator = z.coerce.number();
         break;
       case 'checkbox':
@@ -17,7 +18,32 @@ export const generateZodSchema = (schema: FormSchema) => {
           fieldValidator = (fieldValidator as z.ZodArray<z.ZodString>).min(1, 'Please select at least one option');
         }
         break;
+      case 'toggle':
+        fieldValidator = z.boolean();
+        if (field.required) {
+          fieldValidator = z.literal(true, {
+            errorMap: () => ({ message: 'This field is required' })
+          });
+        }
+        break;
+      case 'file':
+        fieldValidator = z.any();
+        // custom validation logic over FileList can go here
+        if (field.required) {
+          fieldValidator = fieldValidator.refine((val) => val && val.length > 0, "File is required");
+        }
+        break;
       case 'text':
+      case 'firstName':
+      case 'lastName':
+      case 'fullName':
+      case 'email':
+      case 'tel':
+      case 'password':
+      case 'url':
+      case 'date':
+      case 'time':
+      case 'textarea':
       case 'select':
       case 'radio':
       default:

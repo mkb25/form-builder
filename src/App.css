@@ -51,6 +51,24 @@
   gap: 1rem;
 }
 
+.palette-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.palette-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #888);
+  margin: 0 0 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+
 .canvas-area {
   background-color: var(--bg-main);
   overflow-y: auto;
@@ -65,4 +83,27 @@
   border-left: 1px solid var(--border);
   overflow-y: auto;
   padding: 1.5rem;
+}
+
+/* Flex layout so fields flow by percentage width */
+.fields-list {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  /* padding matches the 0.4rem wrapper padding so cards align to container edges */
+  margin: -0.4rem;
+}
+
+/* Resize handle visibility */
+.field-wrapper .resize-handle .resize-grip {
+  opacity: 0.3;
+}
+.field-wrapper:hover .resize-handle .resize-grip,
+.field-wrapper .resize-handle:hover .resize-grip {
+  opacity: 1;
+}
+
+/* Show col-resize cursor on the whole handle zone */
+.field-wrapper .resize-handle:hover {
+  background: transparent;
 }

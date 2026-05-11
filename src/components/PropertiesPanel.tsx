@@ -96,6 +96,8 @@ export const PropertiesPanel: React.FC = () => {
           <label htmlFor="field-required" style={{ fontSize: '0.875rem' }}>Required field</label>
         </div>
 
+
+
         {(field.type === 'select' || field.type === 'radio' || field.type === 'checkbox') && (
           <div>
             <label className="label-base" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>

@@ -36,15 +36,63 @@ export const FormElement: React.FC<FormElementProps> = ({
   const renderInput = () => {
     switch (field.type) {
       case 'text':
+      case 'firstName':
+      case 'lastName':
+      case 'fullName':
+      case 'email':
+      case 'tel':
+      case 'password':
+      case 'url':
+      case 'date':
+      case 'time':
+      case 'file': {
+        const inputType = ['email', 'password', 'tel', 'url', 'date', 'time', 'file'].includes(field.type) ? field.type : 'text';
         return (
           <input
             {...commonProps}
-            type="text"
+            type={inputType}
+            className="input-base"
+            placeholder={field.placeholder || ''}
+            value={value || ''}
+            onChange={(e) => onChange?.(inputType === 'file' ? e.target.files : e.target.value)}
+          />
+        );
+      }
+      case 'textarea':
+        return (
+          <textarea
+            {...commonProps}
+            className="input-base"
+            placeholder={field.placeholder || ''}
+            value={value || ''}
+            onChange={(e) => onChange?.(e.target.value)}
+            rows={4}
+          />
+        );
+      case 'rating':
+        return (
+          <input
+            {...commonProps}
+            type="number"
+            min="1"
+            max="5"
             className="input-base"
             placeholder={field.placeholder || ''}
             value={value || ''}
             onChange={(e) => onChange?.(e.target.value)}
           />
+        );
+      case 'toggle':
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <input
+              {...commonProps}
+              type="checkbox"
+              checked={!!value}
+              onChange={(e) => onChange?.(e.target.checked)}
+              style={{ width: '1.5rem', height: '1.5rem' }}
+            />
+          </div>
         );
       case 'number':
         return (
