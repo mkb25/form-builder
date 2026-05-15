@@ -1,74 +1,150 @@
-# React + TypeScript + Vite
+# WCAG Form Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A drag-and-drop form builder for creating accessible form schemas in the browser. The app lets users assemble fields, edit labels and options, resize fields, preview the final form, validate submissions, and export the generated JSON schema.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Drag new fields from a grouped element palette onto the builder canvas.
+- Reorder fields with `@dnd-kit` sortable drag-and-drop.
+- Edit form-level title and description.
+- Configure each field's label, help text, required state, placeholder, and choice options where applicable.
+- Resize fields from 15% to 100% width for multi-column layouts.
+- Preview the form with accessible labels, help text, error messages, and required indicators.
+- Validate preview submissions with `react-hook-form`, `zod`, and `@hookform/resolvers`.
+- Persist the current schema in `localStorage` under `wcag-form-builder-schema`.
+- Export the full form schema as JSON from the header action.
+- Deploy as a Cloudflare-backed Vite app using Wrangler.
 
-## React Compiler
+## Supported Field Types
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The builder currently supports:
 
-## Expanding the ESLint configuration
+- Personal information: first name, last name, full name, email, phone, password
+- Basic inputs: short text, long text, number, URL, date, time
+- Choice fields: dropdown, checkboxes, radio buttons
+- Advanced fields: file upload, rating, toggle
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- React 19
+- TypeScript
+- Vite
+- Cloudflare Vite plugin and Wrangler
+- `@dnd-kit` for drag-and-drop
+- `react-hook-form` and `zod` for preview validation
+- `lucide-react` for icons
+- `nanoid` for schema and field IDs
+- ESLint 9
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Project Structure
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+src/
+  App.tsx                         App shell, drag/drop orchestration, preview/export modal
+  context/BuilderContext.tsx      Shared builder state, localStorage persistence, accessibility announcements
+  components/
+    Sidebar.tsx                   Draggable field palette
+    BuilderCanvas.tsx             Droppable canvas and sortable field list
+    SortableField.tsx             Field card, drag handle, resize handle, delete action
+    PropertiesPanel.tsx           Form and field editing controls
+    FormPreview.tsx               Runtime preview with validation
+    fields/FormElement.tsx        Accessible renderer for each field type
+  types/index.ts                  Form schema TypeScript types
+  utils/schemaGenerator.ts        Zod schema generation from form schema
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js 20 or newer is recommended for the current Vite, Wrangler, and TypeScript toolchain.
+- npm
+
+### Install
+
+```bash
+npm install
 ```
-# form-builder
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+Vite will print the local development URL, usually `http://localhost:5173`.
+
+### Build
+
+```bash
+npm run build
+```
+
+This runs TypeScript project builds and then creates the production Vite build.
+
+### Lint
+
+```bash
+npm run lint
+```
+
+### Preview With Wrangler
+
+```bash
+npm run preview
+```
+
+This builds the app and serves it through `wrangler dev`.
+
+### Deploy
+
+```bash
+npm run deploy
+```
+
+The deployment uses [wrangler.jsonc](./wrangler.jsonc), including SPA fallback handling via `assets.not_found_handling`.
+
+## Form Schema
+
+The builder stores and exports a schema shaped like this:
+
+```ts
+interface FormSchema {
+  id: string;
+  title: string;
+  description?: string;
+  fields: FormField[];
+}
+
+interface FormField {
+  id: string;
+  type: FieldType;
+  label: string;
+  placeholder?: string;
+  helpText?: string;
+  required: boolean;
+  width?: number;
+  options?: FieldOption[];
+  validation?: ValidationRule[];
+}
+```
+
+Choice fields use `options`; most fields can be marked as required. Field width is stored as a percentage and defaults to `100` when omitted.
+
+## Accessibility Notes
+
+This project is intentionally accessibility-focused:
+
+- Inputs are rendered with explicit labels.
+- Help text and validation errors are connected with `aria-describedby`.
+- Invalid fields expose `aria-invalid`.
+- Required fields expose `aria-required` and visible/screen-reader indicators.
+- Builder actions announce key drag, add, remove, and reorder events through a polite live region.
+- Radio and checkbox groups use group semantics with labelled controls.
+
+## Current Limitations
+
+- The export modal displays JSON but does not copy or download it automatically.
+- Preview submission logs data to the browser console and shows an alert.
+- Additional validation rules are partially scaffolded in the schema generator and can be expanded.
+- Form schemas are stored only in browser `localStorage`; there is no backend persistence.
